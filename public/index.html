@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>NovelAI Vibe Maker</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="shell">
     <header>
       <span class="eyebrow">NOVELAI VIBE TRANSFER</span>
       <h1>参考图转 Vibe</h1>
-      <p>上传图片，由服务端调用 NovelAI 编码，并下载兼容的 <code>.naiv4vibe</code> 文件。</p>
+      <p>上传图片，在浏览器中直连 NovelAI 编码，并下载兼容的 <code>.naiv4vibe</code> 文件。</p>
     </header>
 
     <form id="form" class="card">
@@ -29,7 +29,7 @@
           <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="pst-…" required>
           <button id="toggleToken" class="secondary" type="button" aria-label="显示或隐藏 Token">显示</button>
         </div>
-        <small>仅随本次生成请求通过 HTTPS 发送，服务端不保存。不要在不信任的网站输入 Token。</small>
+        <small>Token 仅在你的浏览器中用于本次请求，不会提交给本站服务器。</small>
       </label>
 
       <div class="grid">
@@ -55,6 +55,6 @@
       <span>编码请求中的 information_extracted 固定为 1；“参考强度”只写入下载文件的导入元数据。</span>
     </aside>
   </main>
-  <script src="/app.js" type="module"></script>
+  <script src="app.js" type="module"></script>
 </body>
 </html>
