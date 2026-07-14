@@ -36,10 +36,6 @@
         <label>提示词 Prompt
           <textarea id="prompt" rows="5" placeholder="1girl, masterpiece, best quality..."></textarea>
         </label>
-        <label>负面提示词 Negative Prompt
-          <textarea id="uc" rows="3" placeholder="lowres, bad anatomy, bad hands, text, watermark"></textarea>
-        </label>
-
         <div class="grid three">
           <label>模型
             <select id="genModel">
@@ -79,7 +75,7 @@
         </section>
 
         <section class="picker-block">
-          <div class="section-head"><div><h2>选择画师串</h2><p>勾选后会自动追加到 Prompt 末尾。</p></div><button id="refreshArtists" class="secondary small" type="button">刷新</button></div>
+          <div class="section-head"><div><h2>选择画师串</h2><p>勾选后会自动追加正向画师串；对应负面提示词会自动写入 NovelAI 负面参数。</p></div><button id="refreshArtists" class="secondary small" type="button">刷新</button></div>
           <div id="artistPicker" class="chip-list"></div>
           <p id="artistPickerEmpty" class="empty">画师库暂无内容。可到“画师库”添加。</p>
         </section>
@@ -121,10 +117,11 @@
     </section>
 
     <section id="artistsPanel" class="card hidden">
-      <div class="library-head"><div><h2>画师库</h2><p>保存常用 artist tag / 画师串，生图时可一键勾选追加。</p></div></div>
+      <div class="library-head"><div><h2>画师库</h2><p>保存常用 artist tag / 画师串，并可为每组画师串配置专属负面提示词。</p></div></div>
       <form id="artistForm" class="artist-form">
         <label>名称<input id="artistName" placeholder="例如：蓝丝绒常用画师串"></label>
-        <label>画师串<textarea id="artistText" rows="3" placeholder="artist:name, by xxx, style of ..."></textarea></label>
+        <label>正向画师串<textarea id="artistText" rows="3" placeholder="artist:name, by xxx, style of ..."></textarea></label>
+        <label>负面提示词<textarea id="artistNegative" rows="3" placeholder="lowres, bad anatomy, bad hands..."></textarea></label>
         <button type="submit">保存画师串</button>
       </form>
       <div id="artistList" class="library-list"></div>
