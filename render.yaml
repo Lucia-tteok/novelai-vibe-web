@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: novelai-vibe-web
+    runtime: node
+    plan: free
+    buildCommand: ""
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NOVELAI_API_BASE
+        value: https://image.novelai.net
+      - key: MAX_IMAGE_BYTES
+        value: 10485760
+      - key: RATE_LIMIT_MAX
+        value: 10
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 3600000
+      - key: UPSTREAM_TIMEOUT_MS
+        value: 60000

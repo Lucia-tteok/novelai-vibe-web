@@ -1,0 +1,7 @@
+.env
+.git
+.gitignore
+node_modules
+*.log
+real-test.naiv4vibe
+test-reference.png
