@@ -19,6 +19,7 @@
       <button id="tabMaker" class="tab" type="button">生成 Vibe</button>
       <button id="tabLibrary" class="tab" type="button">Vibe库 <span id="libraryCount">0</span></button>
       <button id="tabArtists" class="tab" type="button">画师库 <span id="artistCount">0</span></button>
+      <button id="tabImport" class="tab" type="button">压缩包导入</button>
     </section>
 
     <section id="generatePanel">
@@ -128,6 +129,21 @@
       </form>
       <div id="artistList" class="library-list"></div>
       <p id="artistEmpty" class="empty">暂无画师串。</p>
+    </section>
+
+    <section id="importPanel" class="card hidden">
+      <div class="library-head">
+        <div>
+          <h2>从压缩包导入</h2>
+          <p>选择包含画师串和 Vibe 的 ZIP，会在浏览器本地解析并导入到 Vibe库 / 画师库。不会上传压缩包或 Token。</p>
+        </div>
+        <label class="import-btn">选择 ZIP<input id="importZip" type="file" accept=".zip,application/zip"></label>
+      </div>
+      <div class="import-tips">
+        <strong>支持内容</strong>
+        <span>.naiv4vibe 文件、包含 NovelAI Vibe 的 JSON、常见画师串/提示词预设 JSON。会自动跳过 .git、tagData 标签库和大二进制文件。</span>
+      </div>
+      <pre id="zipImportReport" class="import-report">尚未导入。</pre>
     </section>
 
     <aside class="note"><strong>说明</strong><span>所有 Token、Vibe库、画师库都只保存在当前浏览器本地。生图接口为浏览器直连 NovelAI；若 NovelAI 调整 CORS 或参数，页面会显示 API 错误。</span></aside>
