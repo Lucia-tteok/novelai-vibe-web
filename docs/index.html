@@ -10,30 +10,91 @@
   <main class="shell">
     <header>
       <span class="eyebrow">NOVELAI VIBE TRANSFER</span>
-      <h1>参考图转 Vibe</h1>
-      <p>上传图片，在浏览器中直连 NovelAI 编码，并下载兼容的 <code>.naiv4vibe</code> 文件。Token 和 Vibe库均保存在你自己的浏览器本地。</p>
+      <h1>Vibe库 + 生图</h1>
+      <p>上传图片生成 <code>.naiv4vibe</code>，把 Vibe 和画师串保存在本机浏览器，并用自己的 NovelAI Token 直连生成图片。</p>
     </header>
 
     <section class="tabs" aria-label="功能切换">
-      <button id="tabMaker" class="tab active" type="button">生成 Vibe</button>
+      <button id="tabGenerate" class="tab active" type="button">生图</button>
+      <button id="tabMaker" class="tab" type="button">生成 Vibe</button>
       <button id="tabLibrary" class="tab" type="button">Vibe库 <span id="libraryCount">0</span></button>
+      <button id="tabArtists" class="tab" type="button">画师库 <span id="artistCount">0</span></button>
     </section>
 
-    <section id="makerPanel">
-      <form id="form" class="card">
-        <label id="drop" class="drop">
-          <input id="file" type="file" accept="image/png,image/jpeg,image/webp" required>
-          <img id="preview" alt="图片预览">
-          <div id="placeholder"><strong>选择或拖入参考图片</strong><span>PNG / JPEG / WebP，最大 10 MB</span></div>
-        </label>
-
-        <label class="token-field">NovelAI Token
+    <section id="generatePanel">
+      <form id="generateForm" class="card stack">
+        <label class="token-field no-margin">NovelAI Token
           <div class="token-input">
             <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="pst-…" required>
             <button id="toggleToken" class="secondary" type="button">显示</button>
           </div>
           <label class="checkline"><input id="rememberToken" type="checkbox"><span>记住 Token 到本机浏览器，下次自动填入</span></label>
-          <small>Token 只保存在当前浏览器 localStorage 中；不要在公共设备上勾选。</small>
+          <small>Token 只保存在当前浏览器 localStorage 中；不会上传到 GitHub/服务器。</small>
+        </label>
+
+        <label>提示词 Prompt
+          <textarea id="prompt" rows="5" placeholder="1girl, masterpiece, best quality..."></textarea>
+        </label>
+        <label>负面提示词 Negative Prompt
+          <textarea id="uc" rows="3" placeholder="lowres, bad anatomy, bad hands, text, watermark"></textarea>
+        </label>
+
+        <div class="grid three">
+          <label>模型
+            <select id="genModel">
+              <option value="nai-diffusion-4-5-full">V4.5 Full</option>
+              <option value="nai-diffusion-4-5-curated">V4.5 Curated</option>
+              <option value="nai-diffusion-4-full">V4 Full</option>
+              <option value="nai-diffusion-4-curated-preview">V4 Curated</option>
+            </select>
+          </label>
+          <label>尺寸
+            <select id="genSize">
+              <option value="832x1216">竖图 832×1216</option>
+              <option value="1216x832">横图 1216×832</option>
+              <option value="1024x1024">方图 1024×1024</option>
+              <option value="1024x1536">大竖图 1024×1536</option>
+            </select>
+          </label>
+          <label>采样器
+            <select id="sampler">
+              <option value="k_euler_ancestral">Euler Ancestral</option>
+              <option value="k_dpmpp_2m">DPM++ 2M</option>
+              <option value="k_dpmpp_sde">DPM++ SDE</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="grid three">
+          <label>步数 <input id="steps" type="number" min="1" max="50" value="28"></label>
+          <label>提示词强度 <input id="scale" type="number" min="1" max="10" step="0.1" value="5.0"></label>
+          <label>Seed（-1 随机）<input id="seed" type="number" value="-1"></label>
+        </div>
+
+        <section class="picker-block">
+          <div class="section-head"><div><h2>选择 Vibe</h2><p>从 Vibe库选择，最多 16 个。每个可单独设置参考强度与信息提取。</p></div><button id="refreshVibes" class="secondary small" type="button">刷新</button></div>
+          <div id="vibePicker" class="picker-list"></div>
+          <p id="vibePickerEmpty" class="empty">Vibe库暂无内容。可先生成或导入 Vibe。</p>
+        </section>
+
+        <section class="picker-block">
+          <div class="section-head"><div><h2>选择画师串</h2><p>勾选后会自动追加到 Prompt 末尾。</p></div><button id="refreshArtists" class="secondary small" type="button">刷新</button></div>
+          <div id="artistPicker" class="chip-list"></div>
+          <p id="artistPickerEmpty" class="empty">画师库暂无内容。可到“画师库”添加。</p>
+        </section>
+
+        <div class="actions"><button id="generateSubmit" type="submit">生成图片</button><button id="downloadLastImage" class="secondary" type="button" disabled>下载上次图片</button></div>
+        <p id="genStatus" role="status"></p>
+        <div id="resultBox" class="result hidden"><img id="resultImage" alt="生成结果"></div>
+      </form>
+    </section>
+
+    <section id="makerPanel" class="hidden">
+      <form id="form" class="card">
+        <label id="drop" class="drop">
+          <input id="file" type="file" accept="image/png,image/jpeg,image/webp" required>
+          <img id="preview" alt="图片预览">
+          <div id="placeholder"><strong>选择或拖入参考图片</strong><span>PNG / JPEG / WebP，最大 10 MB</span></div>
         </label>
 
         <div class="grid">
@@ -58,8 +119,20 @@
       <p id="libraryEmpty" class="empty">暂无保存的 Vibe。生成后点击“保存到 Vibe库”，或导入已有 JSON / .naiv4vibe 文件。</p>
     </section>
 
-    <aside class="note"><strong>说明</strong><span>编码请求中的 information_extracted 固定为 1；“参考强度”只写入下载文件的导入元数据。</span></aside>
+    <section id="artistsPanel" class="card hidden">
+      <div class="library-head"><div><h2>画师库</h2><p>保存常用 artist tag / 画师串，生图时可一键勾选追加。</p></div></div>
+      <form id="artistForm" class="artist-form">
+        <label>名称<input id="artistName" placeholder="例如：蓝丝绒常用画师串"></label>
+        <label>画师串<textarea id="artistText" rows="3" placeholder="artist:name, by xxx, style of ..."></textarea></label>
+        <button type="submit">保存画师串</button>
+      </form>
+      <div id="artistList" class="library-list"></div>
+      <p id="artistEmpty" class="empty">暂无画师串。</p>
+    </section>
+
+    <aside class="note"><strong>说明</strong><span>所有 Token、Vibe库、画师库都只保存在当前浏览器本地。生图接口为浏览器直连 NovelAI；若 NovelAI 调整 CORS 或参数，页面会显示 API 错误。</span></aside>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="app.js" type="module"></script>
 </body>
 </html>
