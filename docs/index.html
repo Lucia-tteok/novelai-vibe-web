@@ -19,54 +19,14 @@
       <button id="tabMaker" class="tab" type="button">生成 Vibe</button>
       <button id="tabLibrary" class="tab" type="button">Vibe库 <span id="libraryCount">0</span></button>
       <button id="tabArtists" class="tab" type="button">画师库 <span id="artistCount">0</span></button>
-      <button id="tabImport" class="tab" type="button">压缩包导入</button>
+      <button id="tabImport" class="tab" type="button">设置</button>
     </section>
 
     <section id="generatePanel">
       <form id="generateForm" class="card stack">
-        <label class="token-field no-margin">NovelAI Token
-          <div class="token-input">
-            <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="pst-…" required>
-            <button id="toggleToken" class="secondary" type="button">显示</button>
-          </div>
-          <label class="checkline"><input id="rememberToken" type="checkbox"><span>记住 Token 到本机浏览器，下次自动填入</span></label>
-          <small>Token 只保存在当前浏览器 localStorage 中；不会上传到 GitHub/服务器。</small>
-        </label>
-
         <label>提示词 Prompt
           <textarea id="prompt" rows="5" placeholder="1girl, masterpiece, best quality..."></textarea>
         </label>
-        <div class="grid three">
-          <label>模型
-            <select id="genModel">
-              <option value="nai-diffusion-4-5-full">V4.5 Full</option>
-              <option value="nai-diffusion-4-5-curated">V4.5 Curated</option>
-              <option value="nai-diffusion-4-full">V4 Full</option>
-              <option value="nai-diffusion-4-curated-preview">V4 Curated</option>
-            </select>
-          </label>
-          <label>尺寸
-            <select id="genSize">
-              <option value="832x1216">竖图 832×1216</option>
-              <option value="1216x832">横图 1216×832</option>
-              <option value="1024x1024">方图 1024×1024</option>
-              <option value="1024x1536">大竖图 1024×1536</option>
-            </select>
-          </label>
-          <label>采样器
-            <select id="sampler">
-              <option value="k_euler_ancestral">Euler Ancestral</option>
-              <option value="k_dpmpp_2m">DPM++ 2M</option>
-              <option value="k_dpmpp_sde">DPM++ SDE</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="grid three">
-          <label>步数 <input id="steps" type="number" min="1" max="50" value="28"></label>
-          <label>提示词强度 <input id="scale" type="number" min="1" max="10" step="0.1" value="5.0"></label>
-          <label>Seed（-1 随机）<input id="seed" type="number" value="-1"></label>
-        </div>
 
         <section class="picker-block">
           <div class="section-head"><div><h2>选择 Vibe</h2><p>从 Vibe库选择，最多 16 个。每个可单独设置参考强度与信息提取。</p></div><button id="refreshVibes" class="secondary small" type="button">刷新</button></div>
@@ -80,9 +40,9 @@
           <p id="artistPickerEmpty" class="empty">画师库暂无内容。可到“画师库”添加。</p>
         </section>
 
-        <div class="actions"><button id="generateSubmit" type="submit">生成图片</button><button id="downloadLastImage" class="secondary" type="button" disabled>下载上次图片</button></div>
+        <div class="actions"><button id="generateSubmit" type="submit">生成图片</button><button id="downloadLastImage" class="secondary" type="button" disabled>保存图片</button></div>
         <p id="genStatus" role="status"></p>
-        <div id="resultBox" class="result hidden"><img id="resultImage" alt="生成结果"></div>
+        <div id="resultBox" class="result hidden" title="点击查看大图"><img id="resultImage" alt="生成结果"></div>
       </form>
     </section>
 
@@ -119,9 +79,9 @@
     <section id="artistsPanel" class="card hidden">
       <div class="library-head"><div><h2>画师库</h2><p>保存常用 artist tag / 画师串，并可为每组画师串配置专属负面提示词。</p></div></div>
       <form id="artistForm" class="artist-form">
-        <label>名称<input id="artistName" placeholder="例如：蓝丝绒常用画师串"></label>
-        <label>正向画师串<textarea id="artistText" rows="3" placeholder="artist:name, by xxx, style of ..."></textarea></label>
-        <label>负面提示词<textarea id="artistNegative" rows="3" placeholder="lowres, bad anatomy, bad hands..."></textarea></label>
+        <label class="artist-name-field">名称<textarea id="artistName" rows="3" placeholder="例如：蓝丝绒常用画师串"></textarea></label>
+        <label class="artist-positive-field">正向画师串<textarea id="artistText" rows="3" placeholder="artist:name, by xxx, style of ..."></textarea></label>
+        <label class="artist-negative-field">负面提示词<textarea id="artistNegative" rows="3" placeholder="lowres, bad anatomy, bad hands..."></textarea></label>
         <button type="submit">保存画师串</button>
       </form>
       <div id="artistList" class="library-list"></div>
@@ -129,19 +89,28 @@
     </section>
 
     <section id="importPanel" class="card hidden">
-      <div class="library-head">
-        <div>
-          <h2>从压缩包导入</h2>
-          <p>选择包含画师串和 Vibe 的 ZIP，会在浏览器本地解析并导入到 Vibe库 / 画师库。不会上传压缩包或 Token。</p>
+      <div class="library-head settings-head"><div><h2>设置</h2><p>配置 NovelAI Token、生图模型和常用生成参数。配置只保存在当前浏览器。</p></div></div>
+      <div class="settings-block">
+        <label class="token-field no-margin">NovelAI Token
+          <div class="token-input"><input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="pst-…"><button id="toggleToken" class="secondary" type="button">显示</button></div>
+          <label class="checkline"><input id="rememberToken" type="checkbox"><span>记住 Token 到本机浏览器，下次自动填入</span></label>
+          <small>Token 只保存在当前浏览器 localStorage 中；不会上传到 GitHub/服务器。</small>
+        </label>
+        <div class="grid three settings-grid">
+          <label>模型<select id="genModel"><option value="nai-diffusion-4-5-full">V4.5 Full</option><option value="nai-diffusion-4-5-curated">V4.5 Curated</option><option value="nai-diffusion-4-full">V4 Full</option><option value="nai-diffusion-4-curated-preview">V4 Curated</option></select></label>
+          <label>尺寸<select id="genSize"><option value="832x1216">竖图 832×1216</option><option value="1216x832">横图 1216×832</option><option value="1024x1024">方图 1024×1024</option><option value="1024x1536">大竖图 1024×1536</option></select></label>
+          <label>采样器<select id="sampler"><option value="k_euler_ancestral">Euler Ancestral</option><option value="k_dpmpp_2m">DPM++ 2M</option><option value="k_dpmpp_sde">DPM++ SDE</option></select></label>
+          <label>步数 <input id="steps" type="number" min="1" max="50" value="28"></label>
+          <label>提示词强度 <input id="scale" type="number" min="1" max="10" step="0.1" value="5.0"></label>
+          <label>Seed（-1 随机）<input id="seed" type="number" value="-1"></label>
         </div>
-        <label class="import-btn">选择 ZIP<input id="importZip" type="file" accept=".zip,application/zip"></label>
       </div>
-      <div class="import-tips">
-        <strong>支持内容</strong>
-        <span>.naiv4vibe 文件、包含 NovelAI Vibe 的 JSON、常见画师串/提示词预设 JSON。会自动跳过 .git、tagData 标签库和大二进制文件。</span>
-      </div>
+      <div class="library-head zip-settings-head"><div><h2>压缩包导入</h2><p>选择包含画师串和 Vibe 的 ZIP，会在浏览器本地解析并导入到 Vibe库 / 画师库。</p></div><label class="import-btn">选择 ZIP<input id="importZip" type="file" accept=".zip,application/zip"></label></div>
+      <div class="import-tips"><strong>支持内容</strong><span>.naiv4vibe 文件、包含 NovelAI Vibe 的 JSON、常见画师串/提示词预设 JSON。会自动跳过 .git、tagData 标签库和大二进制文件。</span></div>
       <pre id="zipImportReport" class="import-report">尚未导入。</pre>
     </section>
+
+    <div id="imageModal" class="image-modal hidden" role="dialog" aria-modal="true" aria-label="生成图片大图预览"><button id="closeImageModal" class="image-modal-close" type="button" aria-label="关闭">×</button><img id="modalImage" alt="生成图片大图"></div>
 
     <aside class="note"><strong>说明</strong><span>所有 Token、Vibe库、画师库都只保存在当前浏览器本地。生图接口为浏览器直连 NovelAI；若 NovelAI 调整 CORS 或参数，页面会显示 API 错误。</span></aside>
   </main>
